@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Webpage title -->
+    <title>MyOwnWords By Jun</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#orders-box').html('');
+            listing();
+        });
+
+        function add_newsentence() {
+            let word_id = $('#word_id').html(); 
+            let example_sentence = $('#example_sentence').val();
+            let context = $('#context').val();
+            let web_link = $('#web_link').val();
+
+            if (example_sentence == '') {
+                alert('Enter example sentence');
+                $('#example_sentence').focus();
+                return;
+            } else if (context == '') {
+                alert('Enter context and source');
+                $('#context').focus();
+                return;
+            } 
+
+            $.ajax({
+                type: 'POST',
+                url: '/add_newsentence',
+                data: {word_id_give: word_id, example_sentence_give: example_sentence, context_give: context, web_link_give: web_link},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert(response['msg']);
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+
+        function listing() {
+           $.ajax({
+                type: "GET",
+                url: "/fetch_word",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let word = response['word'];
+                        append_word(word[0][0], word[0][1], word[0][2], word[0][3]);
+                        let example_sentence = response['example_sentence'];
+                        for (let i =0; i < example_sentence.length; i++) {
+                            append_sentence(example_sentence[i][0], example_sentence[i][1]);
+                        };
+                                                
+                    } else {
+                        alert('Failed in fetching word and example sentence');
+                    }
+                }
+            });
+        }
+
+        function append_word(id, word, word_definition, counts_of_memory) {
+            let temp_html = '<tr>\
+                                <td>'+ word + '</td>\
+                                <td></td>\
+                            </tr>\
+                            <tr>\
+                                <td>No: </td>\
+                                <td id="word_id">'+ id + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td>Counts of memory: </td>\
+                                <td>'+ counts_of_memory + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td> Definition: </td>\
+                                <td>'+ word_definition + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td></td>\
+                                <td></td>\
+                            </tr>';
+            $('#orders-box').append(temp_html);
+        }
+
+        function append_sentence(example_sentence, context) {
+            let sentence_html = '<tr>\
+                                <td> Example Sentence </td>\
+                                <td>'+ example_sentence + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td> Context </td>\
+                                <td>'+ context + '</td>\
+                            </tr>\
+                            <tr>\
+                                <td></td>\
+                                <td></td>\
+                            </tr>';
+            $('#orders-box').append(sentence_html);
+        }
+
+    </script>
+
+    <style type="text/css">
+        * {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+
+        .wrap {
+            width: 500px;
+            margin: auto;
+        }
+
+        .img {
+            background-image: url('https://pweb_links.123rf.com/images/maxxyustas/maxxyustas1511/maxxyustas151100002/47858355-education-concept-books-and-textbooks-on-the-bookshelf-3d.jpg');
+            background-size: cover;
+            background-position: center;
+            width: 500px;
+            height: 300px;
+        }
+
+        .info {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            margin: 20px 5px auto 5px;
+        }
+
+        h1,
+        h5 {
+            display: inline;
+        }
+
+        .order {
+            text-align: center;
+        }
+
+        .orders {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="info">
+            <h1>My Own Words Collection</h1>
+            <p>I wish I had known these words back then!</p>
+        </div>
+        
+        <div class="orders">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Today's word</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody id="orders-box">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="info">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">New Example Sentence</span>
+                </div>
+                <input type="text" class="form-control" id="example_sentence" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Context and Source</span>
+                </div>
+                <input type="text" class="form-control" id="context" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Web link</span>
+                </div>
+                <textarea class="form-control" aria-describedby="basic-addon3" name="bookweb_link" id="web_link" cols="30"
+                    rows="1" onkeyup="is_long(this)"></textarea>
+            </div>
+            <div class="order">
+                <button onclick="add_newsentence()" type="button" class="btn btn-primary">Send to my brain!</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
