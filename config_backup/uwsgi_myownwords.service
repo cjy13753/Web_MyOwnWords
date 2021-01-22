@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve MyOwnWords
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/myownwords
+Environment="PATH=/home/ubuntu/myownwords/venv/bin"
+ExecStart=/home/ubuntu/myownwords/venv/bin/uwsgi --ini uwsgi.ini
+
+[Install]
+WantedBy=multi-user.target
